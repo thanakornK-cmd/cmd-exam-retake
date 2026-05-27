@@ -8,6 +8,7 @@ type BookRow = {
   category: string;
   totalCopies: number;
   availableCopies: number;
+  memberLoanStatus?: "ACTIVE" | "OVERDUE" | "RETURNED" | null;
 };
 
 type CatalogTableProps = {
@@ -71,6 +72,13 @@ export function CatalogTable({ books, onBorrow, isBorrowing }: CatalogTableProps
     cursor: "pointer",
   };
 
+  function getStatusLabel(status: BookRow["memberLoanStatus"]) {
+    if (!status) return "Not borrowed";
+    if (status === "ACTIVE") return "Active";
+    if (status === "OVERDUE") return "Overdue";
+    return "Returned";
+  }
+
   return (
     <table style={tableStyle}>
       <thead>
@@ -78,6 +86,7 @@ export function CatalogTable({ books, onBorrow, isBorrowing }: CatalogTableProps
           <th style={headCellStyle}>Title</th>
           <th style={headCellStyle}>Author</th>
           <th style={headCellStyle}>Category</th>
+          <th style={headCellStyle}>Your status</th>
           <th style={headCellStyle}>Available</th>
           <th style={headCellStyle}>Total</th>
           {onBorrow ? <th style={headCellStyle}>Action</th> : null}
@@ -89,17 +98,27 @@ export function CatalogTable({ books, onBorrow, isBorrowing }: CatalogTableProps
             <td style={cellStyle}>{book.title}</td>
             <td style={cellStyle}>{book.author}</td>
             <td style={cellStyle}>{book.category}</td>
+            <td style={cellStyle}>{getStatusLabel(book.memberLoanStatus)}</td>
             <td style={cellStyle}>{book.availableCopies}</td>
             <td style={cellStyle}>{book.totalCopies}</td>
             {onBorrow ? (
               <td style={cellStyle}>
                 <button
                   type="button"
-                  disabled={isBorrowing || book.availableCopies <= 0}
+                  disabled={
+                    isBorrowing ||
+                    book.availableCopies <= 0 ||
+                    book.memberLoanStatus === "ACTIVE" ||
+                    book.memberLoanStatus === "OVERDUE"
+                  }
                   onClick={() => onBorrow(book.id)}
                   style={actionButtonStyle}
                 >
-                  {book.availableCopies <= 0 ? "Unavailable" : "Borrow"}
+                  {book.memberLoanStatus === "ACTIVE" || book.memberLoanStatus === "OVERDUE"
+                    ? "Borrowed"
+                    : book.availableCopies <= 0
+                      ? "Unavailable"
+                      : "Borrow"}
                 </button>
               </td>
             ) : null}

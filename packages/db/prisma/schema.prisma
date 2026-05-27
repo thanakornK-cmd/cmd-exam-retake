@@ -28,6 +28,13 @@ model Book {
   loans           Loan[]
 }
 
+model LoanPeriodSetting {
+  id        String      @id @default(cuid())
+  category  BookCategory @unique
+  days      Int
+  updatedAt DateTime    @updatedAt
+}
+
 model Loan {
   id         String     @id @default(cuid())
   loanCode   String     @unique

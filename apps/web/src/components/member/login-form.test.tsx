@@ -27,7 +27,7 @@ describe("LoginForm", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("submits login and redirects to catalog", async () => {
+  it("submits login and redirects to dashboard", async () => {
     fetchMock.mockResolvedValue({
       ok: true,
       json: async () => ({ ok: true }),
@@ -44,7 +44,7 @@ describe("LoginForm", () => {
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith("/api/member/auth/login", expect.any(Object));
-      expect(pushMock).toHaveBeenCalledWith("/catalog");
+      expect(pushMock).toHaveBeenCalledWith("/dashboard");
       expect(refreshMock).toHaveBeenCalled();
     });
   });

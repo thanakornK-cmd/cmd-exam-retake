@@ -89,7 +89,7 @@ export function LoginForm() {
     }
 
     startTransition(() => {
-      router.push("/catalog");
+      router.push("/dashboard");
       router.refresh();
     });
   }

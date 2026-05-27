@@ -1,4 +1,8 @@
-import { BOOK_LOAN_PERIOD_DAYS, FINE_PER_OVERDUE_WEEKDAY } from "./contracts";
+import {
+  BOOK_LOAN_PERIOD_DAYS,
+  FINE_PER_OVERDUE_WEEKDAY,
+  type LoanPeriodMap,
+} from "./contracts";
 
 type LoanCategory = keyof typeof BOOK_LOAN_PERIOD_DAYS;
 
@@ -16,8 +20,12 @@ function formatUtcDate(date: Date) {
   return `${date.getUTCFullYear()}${pad(date.getUTCMonth() + 1)}${pad(date.getUTCDate())}`;
 }
 
-export function calculateDueDate(loanDate: Date, category: LoanCategory) {
-  return addDays(loanDate, BOOK_LOAN_PERIOD_DAYS[category]);
+export function calculateDueDate(
+  loanDate: Date,
+  category: LoanCategory,
+  loanPeriods: LoanPeriodMap = BOOK_LOAN_PERIOD_DAYS,
+) {
+  return addDays(loanDate, loanPeriods[category]);
 }
 
 export function isLoanOverdue(

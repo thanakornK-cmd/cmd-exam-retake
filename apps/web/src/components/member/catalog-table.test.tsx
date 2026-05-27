@@ -16,6 +16,7 @@ describe("CatalogTable", () => {
             category: "textbook",
             totalCopies: 4,
             availableCopies: 4,
+            memberLoanStatus: "ACTIVE",
           },
         ]}
       />,
@@ -24,6 +25,7 @@ describe("CatalogTable", () => {
     expect(screen.getByText("Distributed Systems")).toBeInTheDocument();
     expect(screen.getByText("Tanenbaum")).toBeInTheDocument();
     expect(screen.getByText("textbook")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
     expect(screen.getAllByText("4")).toHaveLength(2);
   });
 });

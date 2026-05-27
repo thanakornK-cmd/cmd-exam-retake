@@ -8,6 +8,11 @@ export async function main() {
     data: seededBooks,
     skipDuplicates: true,
   });
+
+  await prisma.loanPeriodSetting.createMany({
+    data: seededLoanPeriods,
+    skipDuplicates: true,
+  });
 }
 
 export const seededBooks = [
@@ -67,6 +72,12 @@ export const seededBooks = [
     totalCopies: 4,
     availableCopies: 4,
   },
+] as const;
+
+export const seededLoanPeriods = [
+  { category: "textbook", days: 3 },
+  { category: "general", days: 7 },
+  { category: "novel", days: 14 },
 ] as const;
 
 const isDirectExecution = import.meta.url === pathToFileURL(process.argv[1] ?? "").href;

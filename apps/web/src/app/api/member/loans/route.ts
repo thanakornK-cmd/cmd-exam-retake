@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
+import { BOOK_LOAN_PERIOD_DAYS } from "@library/domain";
 import {
   MAX_ACTIVE_LOANS,
   calculateDueDate,
@@ -9,6 +10,12 @@ import { requireMemberSession } from "../../../../lib/auth/guards";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+type LoanPeriodMap = {
+  textbook: number;
+  general: number;
+  novel: number;
+};
 
 export async function POST(request: Request) {
   const auth = await requireMemberSession(request);
@@ -33,6 +40,22 @@ export async function POST(request: Request) {
     prisma.book.findUnique({ where: { id: bookId } }),
     prisma.loan.count(),
   ]);
+  const loanPeriodRows = (await prisma.loanPeriodSetting?.findMany?.()) ?? [];
+  const loanPeriods: LoanPeriodMap = {
+    textbook: BOOK_LOAN_PERIOD_DAYS.textbook,
+    general: BOOK_LOAN_PERIOD_DAYS.general,
+    novel: BOOK_LOAN_PERIOD_DAYS.novel,
+  };
+
+  for (const row of loanPeriodRows) {
+    if (row.category === "textbook") {
+      loanPeriods.textbook = row.days;
+    } else if (row.category === "general") {
+      loanPeriods.general = row.days;
+    } else if (row.category === "novel") {
+      loanPeriods.novel = row.days;
+    }
+  }
 
   if (overdueCount > 0) {
     return NextResponse.json({ error: "Member has overdue loans" }, { status: 409 });
@@ -53,7 +76,7 @@ export async function POST(request: Request) {
         memberId,
         bookId,
         loanDate: now,
-        dueDate: calculateDueDate(now, book.category),
+        dueDate: calculateDueDate(now, book.category, loanPeriods),
         status: "ACTIVE",
       },
     });

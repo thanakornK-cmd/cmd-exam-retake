@@ -9,6 +9,9 @@ const prismaMock = vi.hoisted(() => ({
     findUnique: vi.fn(),
     update: vi.fn(),
   },
+  loanPeriodSetting: {
+    findMany: vi.fn(),
+  },
   $transaction: vi.fn(),
 }));
 
@@ -64,17 +67,22 @@ describe("POST /api/member/loans", () => {
       category: "novel",
       availableCopies: 2,
     });
+    prismaMock.loanPeriodSetting.findMany.mockResolvedValue([
+      { category: "textbook", days: 3 },
+      { category: "general", days: 7 },
+      { category: "novel", days: 21 },
+    ]);
 
-    const createdLoan = {
+    const loanCreateMock = vi.fn().mockResolvedValue({
       id: "loan_1",
       loanCode: "LN-20260527-0002",
-      dueDate: new Date("2026-06-10T00:00:00.000Z"),
-    };
+      dueDate: new Date("2026-06-17T00:00:00.000Z"),
+    });
 
     prismaMock.$transaction.mockImplementation(async (callback) =>
       callback({
         loan: {
-          create: vi.fn().mockResolvedValue(createdLoan),
+          create: loanCreateMock,
         },
         book: {
           update: vi.fn().mockResolvedValue({}),
@@ -93,6 +101,16 @@ describe("POST /api/member/loans", () => {
 
     expect(response.status).toBe(201);
     expect(payload.loanCode).toBe("LN-20260527-0002");
+    expect(loanCreateMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: expect.objectContaining({
+          dueDate: expect.any(Date),
+        }),
+      }),
+    );
+    expect(
+      loanCreateMock.mock.calls[0]?.[0]?.data?.dueDate?.toISOString().slice(0, 10),
+    ).toBe("2026-06-17");
     expect(prismaMock.$transaction).toHaveBeenCalled();
   });
 

@@ -8,3 +8,11 @@ export const BOOK_LOAN_PERIOD_DAYS = {
   general: 7,
   novel: 14,
 } as const;
+
+export type BookLoanPeriodDays = typeof BOOK_LOAN_PERIOD_DAYS;
+
+export type LoanPeriodMap = {
+  textbook: number;
+  general: number;
+  novel: number;
+};

@@ -37,6 +37,16 @@ describe("loan rules", () => {
     expect(generateLoanCode(new Date("2026-05-27T00:00:00Z"), 7)).toBe("LN-20260527-0007");
   });
 
+  it("uses custom loan periods when provided", () => {
+    expect(
+      calculateDueDate(new Date("2026-05-27T00:00:00Z"), "textbook", {
+        textbook: 10,
+        general: 7,
+        novel: 14,
+      }).toISOString(),
+    ).toBe("2026-06-06T00:00:00.000Z");
+  });
+
   it("treats an unreturned past-due loan as overdue", () => {
     expect(
       isLoanOverdue(

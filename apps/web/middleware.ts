@@ -17,7 +17,11 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  const memberArea = pathname === "/catalog" || pathname === "/loans" || pathname === "/history";
+  const memberArea =
+    pathname === "/dashboard" ||
+    pathname === "/catalog" ||
+    pathname === "/loans" ||
+    pathname === "/history";
   const memberApi = pathname.startsWith("/api/member/");
   const adminArea =
     pathname === "/admin/dashboard" ||
@@ -60,6 +64,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    "/dashboard/:path*",
     "/catalog/:path*",
     "/loans/:path*",
     "/history/:path*",

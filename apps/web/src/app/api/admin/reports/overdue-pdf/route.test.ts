@@ -33,4 +33,43 @@ describe("GET /api/admin/reports/overdue-pdf", () => {
 
     expect(response.headers.get("content-type")).toBe("application/pdf");
   });
+
+  it("includes active overdue and returned-late loans in the report", async () => {
+    const { requireAdminSession } = await import("../../../../../lib/auth/guards");
+    requireAdminSession.mockResolvedValue({
+      session: { sub: "admin", role: "admin" },
+      response: null,
+    });
+    prismaMock.loan.findMany.mockResolvedValue([
+      {
+        dueDate: new Date("2026-05-01T00:00:00.000Z"),
+        returnDate: null,
+        fineAmount: null,
+        member: { name: "Alice" },
+        book: { title: "Book A" },
+      },
+      {
+        dueDate: new Date("2026-05-01T00:00:00.000Z"),
+        returnDate: new Date("2026-05-06T00:00:00.000Z"),
+        fineAmount: 60,
+        member: { name: "Bob" },
+        book: { title: "Book B" },
+      },
+      {
+        dueDate: new Date("2026-05-10T00:00:00.000Z"),
+        returnDate: new Date("2026-05-09T00:00:00.000Z"),
+        fineAmount: 0,
+        member: { name: "Carol" },
+        book: { title: "Book C" },
+      },
+    ]);
+
+    const response = await GET(new Request("http://localhost/api/admin/reports/overdue-pdf"));
+    const bodyText = Buffer.from(await response.arrayBuffer()).toString("utf8");
+
+    expect(bodyText).toContain("(Rows: 2) Tj");
+    expect(bodyText).toContain("Alice");
+    expect(bodyText).toContain("Bob");
+    expect(bodyText).not.toContain("Carol");
+  });
 });

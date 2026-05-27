@@ -11,13 +11,22 @@ export async function GET(request: Request) {
   if (auth.response) return auth.response;
 
   const loans = await prisma.loan.findMany({
-    where: { returnDate: null },
+    where: {
+      OR: [
+        { returnDate: null },
+        { returnDate: { not: null } },
+      ],
+    },
     include: { book: true, member: true },
     orderBy: { dueDate: "asc" },
   });
 
   const now = new Date();
-  const overdueLoans = loans.filter((loan) => isLoanOverdue(loan, now));
+  const overdueLoans = loans.filter(
+    (loan) =>
+      isLoanOverdue(loan, now) ||
+      (loan.returnDate !== null && loan.returnDate.getTime() > loan.dueDate.getTime()),
+  );
 
   return NextResponse.json(
     overdueLoans.map((loan) => ({

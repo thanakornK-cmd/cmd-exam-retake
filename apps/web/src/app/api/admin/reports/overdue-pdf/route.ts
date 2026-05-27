@@ -12,22 +12,32 @@ export async function GET(request: Request) {
   if (auth.response) return auth.response;
 
   const loans = await prisma.loan.findMany({
-    where: { returnDate: null },
+    where: {
+      OR: [
+        { returnDate: null },
+        { returnDate: { not: null } },
+      ],
+    },
     include: { book: true, member: true },
     orderBy: { dueDate: "asc" },
   });
 
   const now = new Date();
-  const overdueLoans = loans.filter((loan) => isLoanOverdue(loan, now));
+  const overdueLoans = loans.filter(
+    (loan) =>
+      isLoanOverdue(loan, now) ||
+      (loan.returnDate !== null && loan.returnDate.getTime() > loan.dueDate.getTime()),
+  );
   const pdf = await buildOverdueReportPdf(
     overdueLoans.map((loan) => {
-      const overdueDays = countOverdueWeekdays(loan.dueDate, now);
+      const referenceDate = loan.returnDate ?? now;
+      const overdueDays = countOverdueWeekdays(loan.dueDate, referenceDate);
       return {
         member: loan.member.name,
         book: loan.book.title,
         dueDate: loan.dueDate.toISOString().slice(0, 10),
         overdueDays,
-        fine: loan.fineAmount || calculateFineAmount(loan.dueDate, now),
+        fine: loan.fineAmount || calculateFineAmount(loan.dueDate, referenceDate),
       };
     }),
   );

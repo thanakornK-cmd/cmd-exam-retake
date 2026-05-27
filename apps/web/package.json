@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "npm --prefix ../../packages/db run prisma:generate && npm --prefix ../../packages/db run prisma:migrate:deploy && next build",
+    "build": "npm --prefix ../../packages/db run prisma:generate && next build",
     "lint": "tsc --noEmit",
     "test": "vitest run"
   },

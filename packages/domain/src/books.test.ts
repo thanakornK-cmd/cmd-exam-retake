@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { createBookSchema, initializeBookInventory } from "./books";
 
 describe("book rules", () => {
-  it("rejects unknown categories", () => {
+  it("requires a category name", () => {
     const result = createBookSchema.safeParse({
       title: "Distributed Systems",
       author: "Tanenbaum",
-      category: "science",
+      category: "",
       totalCopies: 4,
     });
 
@@ -18,13 +18,13 @@ describe("book rules", () => {
       initializeBookInventory({
         title: "Distributed Systems",
         author: "Tanenbaum",
-        category: "textbook",
+        category: "science",
         totalCopies: 4,
       }),
     ).toEqual({
       title: "Distributed Systems",
       author: "Tanenbaum",
-      category: "textbook",
+      category: "science",
       totalCopies: 4,
       availableCopies: 4,
     });

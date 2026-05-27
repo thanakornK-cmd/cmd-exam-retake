@@ -31,7 +31,7 @@ describe("GET /api/admin/loan-periods", () => {
     prismaMock.loanPeriodSetting.findMany.mockResolvedValue([
       { category: "textbook", days: 5 },
       { category: "general", days: 8 },
-      { category: "novel", days: 14 },
+      { category: "science", days: 21 },
     ]);
 
     const response = await GET(new Request("http://localhost/api/admin/loan-periods"));
@@ -41,6 +41,7 @@ describe("GET /api/admin/loan-periods", () => {
       textbook: 5,
       general: 8,
       novel: 14,
+      science: 21,
     });
   });
 });
@@ -64,12 +65,17 @@ describe("PATCH /api/admin/loan-periods", () => {
         body: JSON.stringify({
           textbook: 5,
           general: 8,
-          novel: 14,
+          science: 21,
         }),
       }),
     );
 
     expect(response.status).toBe(200);
     expect(prismaMock.loanPeriodSetting.upsert).toHaveBeenCalledTimes(3);
+    expect(prismaMock.loanPeriodSetting.upsert).toHaveBeenCalledWith({
+      where: { category: "science" },
+      update: { days: 21 },
+      create: { category: "science", days: 21 },
+    });
   });
 });

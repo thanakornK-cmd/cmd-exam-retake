@@ -58,6 +58,29 @@ export function LoanList({ loans }: { loans: LoanRow[] }) {
     color: "#0f172a",
   };
 
+  function fineCell(loan: LoanRow) {
+    if (loan.status !== "RETURNED") {
+      return <span style={{ color: "#64748b" }}>-</span>;
+    }
+
+    const highlight = loan.fineAmount > 0;
+    return (
+      <span
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          borderRadius: "999px",
+          padding: "0.2rem 0.55rem",
+          fontWeight: 600,
+          background: highlight ? "rgba(239, 68, 68, 0.12)" : "rgba(34, 197, 94, 0.12)",
+          color: highlight ? "#b91c1c" : "#166534",
+        }}
+      >
+        {loan.fineAmount} THB
+      </span>
+    );
+  }
+
   return (
     <table style={tableStyle}>
       <thead>
@@ -84,7 +107,7 @@ export function LoanList({ loans }: { loans: LoanRow[] }) {
             <td style={cellStyle}>
               <LoanStatusBadge status={loan.status} />
             </td>
-            <td style={cellStyle}>{loan.fineAmount} THB</td>
+            <td style={cellStyle}>{fineCell(loan)}</td>
           </tr>
         ))}
       </tbody>

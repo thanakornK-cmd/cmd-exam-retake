@@ -4,8 +4,6 @@ import {
   type LoanPeriodMap,
 } from "./contracts";
 
-type LoanCategory = keyof typeof BOOK_LOAN_PERIOD_DAYS;
-
 function addDays(date: Date, days: number) {
   const next = new Date(date);
   next.setUTCDate(next.getUTCDate() + days);
@@ -22,10 +20,10 @@ function formatUtcDate(date: Date) {
 
 export function calculateDueDate(
   loanDate: Date,
-  category: LoanCategory,
+  category: string,
   loanPeriods: LoanPeriodMap = BOOK_LOAN_PERIOD_DAYS,
 ) {
-  return addDays(loanDate, loanPeriods[category]);
+  return addDays(loanDate, loanPeriods[category] ?? BOOK_LOAN_PERIOD_DAYS.general);
 }
 
 export function isLoanOverdue(

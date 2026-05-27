@@ -20,25 +20,6 @@ const formStyle: CSSProperties = {
   backdropFilter: "blur(12px)",
 };
 
-const selectStyle: CSSProperties = {
-  width: "100%",
-  borderRadius: "14px",
-  border: "1px solid rgba(148, 163, 184, 0.8)",
-  background: "rgba(255, 255, 255, 0.94)",
-  padding: "0.95rem 1rem",
-  fontSize: "1rem",
-  color: "#0f172a",
-  boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
-};
-
-const categoryLabelStyle: CSSProperties = {
-  display: "grid",
-  gap: "0.45rem",
-  color: "#0f172a",
-  fontSize: "0.95rem",
-  fontWeight: 600,
-};
-
 const alertStyle: CSSProperties = {
   margin: 0,
   padding: "0.9rem 1rem",
@@ -133,14 +114,12 @@ export function AdminBookForm() {
     <form style={formStyle} onSubmit={handleSubmit}>
       <FormField label="Title" name="title" />
       <FormField label="Author" name="author" />
-      <label style={categoryLabelStyle}>
-        <span>Category</span>
-        <select name="category" style={selectStyle} defaultValue="textbook">
-          <option value="textbook">textbook</option>
-          <option value="general">general</option>
-          <option value="novel">novel</option>
-        </select>
-      </label>
+      <FormField
+        label="Category"
+        name="category"
+        placeholder="science"
+        hint="Type a category name. Add or edit the loan period in the panel below."
+      />
       <FormField label="Total copies" name="totalCopies" type="number" min="1" step="1" />
       {status.error ? <p role="alert" style={errorStyle}>{status.error}</p> : null}
       {status.success ? <p role="status" style={successStyle}>{status.success}</p> : null}

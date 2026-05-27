@@ -30,7 +30,7 @@ describe("AdminBookForm", () => {
       target: { value: "Tanenbaum" },
     });
     fireEvent.change(screen.getByLabelText(/category/i), {
-      target: { value: "textbook" },
+      target: { value: "science" },
     });
     fireEvent.change(screen.getByLabelText(/total copies/i), {
       target: { value: "4" },

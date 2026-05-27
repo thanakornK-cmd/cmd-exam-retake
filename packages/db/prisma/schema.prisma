@@ -21,7 +21,7 @@ model Book {
   id              String   @id @default(cuid())
   title           String
   author          String
-  category        BookCategory
+  category        String
   totalCopies     Int
   availableCopies Int
   createdAt       DateTime @default(now())
@@ -30,7 +30,7 @@ model Book {
 
 model LoanPeriodSetting {
   id        String      @id @default(cuid())
-  category  BookCategory @unique
+  category  String      @unique
   days      Int
   updatedAt DateTime    @updatedAt
 }
@@ -54,12 +54,6 @@ model Loan {
   @@index([memberId, status])
   @@index([bookId, status])
   @@index([dueDate, status])
-}
-
-enum BookCategory {
-  textbook
-  general
-  novel
 }
 
 enum LoanStatus {

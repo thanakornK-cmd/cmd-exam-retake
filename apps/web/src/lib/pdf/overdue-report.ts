@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import PDFDocument from "pdfkit";
+
 type OverdueReportRow = {
   member: string;
   book: string;
@@ -6,64 +9,91 @@ type OverdueReportRow = {
   fine: number;
 };
 
-function escapePdfText(value: string) {
-  return value.replaceAll("\\", "\\\\").replaceAll("(", "\\(").replaceAll(")", "\\)");
-}
-
-function buildContentStream(rows: OverdueReportRow[]) {
-  const lines = [
-    "BT",
-    "/F1 18 Tf",
-    "40 550 Td",
-    "(Overdue Loans Report) Tj",
-    "/F1 10 Tf",
-    "0 -30 Td",
-    `(Rows: ${rows.length}) Tj`,
+function resolveThaiFontPath() {
+  const candidates = [
+    "/System/Library/Fonts/Supplemental/Thonburi.ttf",
+    "/System/Library/Fonts/Supplemental/SukhumvitSet.ttf",
+    "/System/Library/Fonts/Supplemental/NotoSansThai.ttc",
   ];
 
-  rows.forEach((row) => {
-    lines.push(`0 -16 Td`);
-    lines.push(
-      `(${escapePdfText(
-        `${row.member} | ${row.book} | ${row.dueDate} | ${row.overdueDays} | ${row.fine} THB`,
-      )}) Tj`,
-    );
-  });
+  return candidates.find((path) => fs.existsSync(path));
+}
 
-  lines.push("ET");
-  return lines.join("\n");
+function formatFine(value: number) {
+  return `${value.toLocaleString("en-US")} THB`;
 }
 
 export async function buildOverdueReportPdf(rows: OverdueReportRow[]) {
-  const objects: string[] = [];
-  const content = buildContentStream(rows);
+  const doc = new PDFDocument({ size: "A4", margin: 40 });
+  const chunks: Buffer[] = [];
 
-  objects.push("1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj");
-  objects.push("2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj");
-  objects.push(
-    "3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 842 595] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj",
-  );
-  objects.push("4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj");
-  objects.push(
-    `5 0 obj << /Length ${content.length} >> stream\n${content}\nendstream endobj`,
-  );
+  doc.on("data", (chunk) => chunks.push(chunk));
 
-  const header = "%PDF-1.4\n";
-  let body = "";
-  const offsets = ["0000000000 65535 f \n"];
-  let position = header.length;
+  const done = new Promise<Uint8Array>((resolve) => {
+    doc.on("end", () => resolve(Buffer.concat(chunks)));
+  });
 
-  for (const object of objects) {
-    offsets.push(`${String(position).padStart(10, "0")} 00000 n \n`);
-    body += `${object}\n`;
-    position += `${object}\n`.length;
+  const thaiFontPath = resolveThaiFontPath();
+  if (thaiFontPath) {
+    doc.registerFont("ReportThai", thaiFontPath);
+    doc.font("ReportThai");
   }
 
-  const xrefOffset = header.length + body.length;
-  const xref = `xref\n0 ${objects.length + 1}\n${offsets.join("")}trailer << /Size ${
-    objects.length + 1
-  } /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
-  const pdf = `${header}${body}${xref}`;
+  doc.fontSize(20).fillColor("#0f172a").text("Overdue Loans Report");
+  doc.moveDown(0.3);
+  doc.fontSize(10).fillColor("#475569").text(`Rows: ${rows.length}`);
+  doc.moveDown(0.8);
 
-  return new TextEncoder().encode(pdf);
+  const columns = [
+    { key: "member", label: "Member", width: 110 },
+    { key: "book", label: "Book", width: 220 },
+    { key: "dueDate", label: "Due Date", width: 90 },
+    { key: "overdueDays", label: "Overdue", width: 60 },
+    { key: "fine", label: "Fine", width: 70 },
+  ] as const;
+
+  let y = doc.y;
+  const startX = 40;
+  const rowHeight = 22;
+  const tableWidth = columns.reduce((sum, col) => sum + col.width, 0);
+
+  doc.roundedRect(startX, y, tableWidth, rowHeight, 3).fill("#e2e8f0");
+  doc.fillColor("#0f172a").fontSize(10);
+
+  let x = startX + 6;
+  for (const col of columns) {
+    doc.text(col.label, x, y + 6, { width: col.width - 12 });
+    x += col.width;
+  }
+
+  y += rowHeight;
+
+  for (const row of rows) {
+    if (y > 780) {
+      doc.addPage();
+      y = 40;
+    }
+
+    doc.rect(startX, y, tableWidth, rowHeight).fill(y % (rowHeight * 2) === 0 ? "#ffffff" : "#f8fafc");
+    doc.fillColor("#1e293b").fontSize(10);
+
+    const values = [
+      row.member,
+      row.book,
+      row.dueDate,
+      String(row.overdueDays),
+      formatFine(row.fine),
+    ];
+
+    x = startX + 6;
+    for (let index = 0; index < columns.length; index += 1) {
+      doc.text(values[index], x, y + 6, { width: columns[index].width - 12, ellipsis: true });
+      x += columns[index].width;
+    }
+
+    y += rowHeight;
+  }
+
+  doc.end();
+  return done;
 }

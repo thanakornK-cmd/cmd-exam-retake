@@ -10,7 +10,7 @@ const prismaMock = vi.hoisted(() => ({
     update: vi.fn(),
   },
   loanPeriodSetting: {
-    findMany: vi.fn(),
+    findMany: vi.fn().mockResolvedValue([]),
   },
   $transaction: vi.fn(),
 }));
@@ -28,6 +28,7 @@ import { POST } from "./route";
 describe("POST /api/member/loans", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    prismaMock.loanPeriodSetting.findMany.mockResolvedValue([]);
   });
 
   it("rejects borrowing when member already has 3 active loans", async () => {
@@ -64,13 +65,13 @@ describe("POST /api/member/loans", () => {
     prismaMock.loan.count.mockResolvedValueOnce(0);
     prismaMock.book.findUnique.mockResolvedValue({
       id: "book_1",
-      category: "novel",
+      category: "science",
       availableCopies: 2,
     });
     prismaMock.loanPeriodSetting.findMany.mockResolvedValue([
       { category: "textbook", days: 3 },
       { category: "general", days: 7 },
-      { category: "novel", days: 21 },
+      { category: "science", days: 21 },
     ]);
 
     const loanCreateMock = vi.fn().mockResolvedValue({

@@ -31,7 +31,7 @@ describe("POST /api/admin/books", () => {
       id: "book_1",
       title: "Distributed Systems",
       author: "Tanenbaum",
-      category: "textbook",
+      category: "science",
       totalCopies: 4,
       availableCopies: 4,
     });
@@ -42,7 +42,7 @@ describe("POST /api/admin/books", () => {
         body: JSON.stringify({
           title: "Distributed Systems",
           author: "Tanenbaum",
-          category: "textbook",
+          category: "science",
           totalCopies: 4,
         }),
       }),
@@ -53,7 +53,7 @@ describe("POST /api/admin/books", () => {
       data: {
         title: "Distributed Systems",
         author: "Tanenbaum",
-        category: "textbook",
+        category: "science",
         totalCopies: 4,
         availableCopies: 4,
       },

@@ -125,6 +125,11 @@ export default function AdminLoansPage() {
               <h2 style={{ margin: 0, fontSize: "1.1rem" }}>{loan.book.title}</h2>
               <p style={{ margin: 0, color: "#475569" }}>Member: {loan.member.name}</p>
               <p style={{ margin: 0, color: "#475569" }}>Status: {loan.status}</p>
+              {loan.status === "RETURNED" ? (
+                <p style={{ margin: 0, color: "#0f172a", fontWeight: 600 }}>
+                  Fine: {loan.fineAmount} THB
+                </p>
+              ) : null}
             </div>
             <LoanEditForm loan={loan} />
             {loan.status !== "RETURNED" ? (

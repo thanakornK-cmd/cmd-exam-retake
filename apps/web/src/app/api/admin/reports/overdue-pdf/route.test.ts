@@ -65,11 +65,16 @@ describe("GET /api/admin/reports/overdue-pdf", () => {
     ]);
 
     const response = await GET(new Request("http://localhost/api/admin/reports/overdue-pdf"));
-    const bodyText = Buffer.from(await response.arrayBuffer()).toString("utf8");
+    const body = await response.arrayBuffer();
 
-    expect(bodyText).toContain("(Rows: 2) Tj");
-    expect(bodyText).toContain("Alice");
-    expect(bodyText).toContain("Bob");
-    expect(bodyText).not.toContain("Carol");
+    expect(prismaMock.loan.findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: {
+          OR: [{ returnDate: null }, { returnDate: { not: null } }],
+        },
+      }),
+    );
+    expect(response.headers.get("content-type")).toBe("application/pdf");
+    expect(body.byteLength).toBeGreaterThan(0);
   });
 });

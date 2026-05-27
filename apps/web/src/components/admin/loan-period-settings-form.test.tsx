@@ -16,7 +16,7 @@ describe("LoanPeriodSettingsForm", () => {
     vi.stubGlobal("fetch", fetchMock);
   });
 
-  it("loads current settings and saves updates", async () => {
+  it("loads existing categories and saves a new one", async () => {
     fetchMock.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -27,34 +27,41 @@ describe("LoanPeriodSettingsForm", () => {
     });
     fetchMock.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({
-        textbook: 5,
-        general: 8,
-        novel: 21,
-      }),
+      json: async () => ({ ok: true }),
     });
 
     render(<LoanPeriodSettingsForm />);
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/textbook/i)).toHaveValue(3);
-      expect(screen.getByLabelText(/general/i)).toHaveValue(7);
-      expect(screen.getByLabelText(/novel/i)).toHaveValue(14);
+      expect(screen.getAllByLabelText(/category name/i)).toHaveLength(3);
+      expect(screen.getAllByLabelText(/loan days/i)).toHaveLength(3);
     });
 
-    fireEvent.change(screen.getByLabelText(/textbook/i), {
-      target: { value: "5" },
-    });
-    fireEvent.change(screen.getByLabelText(/general/i), {
-      target: { value: "8" },
-    });
-    fireEvent.change(screen.getByLabelText(/novel/i), {
-      target: { value: "21" },
-    });
-    fireEvent.submit(screen.getByRole("button", { name: /save loan periods/i }).closest("form")!);
+    fireEvent.click(screen.getByRole("button", { name: /add category/i }));
 
     await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledWith("/api/admin/loan-periods", expect.any(Object));
+      expect(screen.getAllByLabelText(/category name/i)).toHaveLength(4);
+    });
+
+    const categoryInputs = screen.getAllByLabelText(/category name/i);
+    const daysInputs = screen.getAllByLabelText(/loan days/i);
+
+    fireEvent.change(categoryInputs[3], {
+      target: { value: "science" },
+    });
+    fireEvent.change(daysInputs[3], {
+      target: { value: "21" },
+    });
+    fireEvent.submit(screen.getByRole("button", { name: /save categories/i }).closest("form")!);
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenNthCalledWith(
+        2,
+        "/api/admin/loan-periods",
+        expect.objectContaining({
+          method: "PATCH",
+        }),
+      );
     });
   });
 });

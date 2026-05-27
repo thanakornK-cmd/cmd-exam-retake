@@ -1,5 +1,5 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <main>Library Lending System</main>;
+  redirect("/login");
 }

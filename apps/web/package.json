@@ -9,13 +9,21 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@library/db": "file:../../packages/db",
+    "@library/domain": "file:../../packages/domain",
+    "@library/ui": "file:../../packages/ui",
+    "bcryptjs": "^3.0.2",
+    "jose": "^6.0.10",
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/node": "^24.7.2",
     "@types/react": "^19.1.13",
-    "@types/react-dom": "^19.1.9"
+    "@types/react-dom": "^19.1.9",
+    "jsdom": "^26.1.0"
   }
 }

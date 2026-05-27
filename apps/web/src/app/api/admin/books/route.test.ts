@@ -10,6 +10,10 @@ vi.mock("@library/db", () => ({
   prisma: prismaMock,
 }));
 
+vi.mock("../../../../lib/auth/guards", () => ({
+  requireAdminSession: vi.fn(),
+}));
+
 import { POST } from "./route";
 
 describe("POST /api/admin/books", () => {
@@ -18,6 +22,11 @@ describe("POST /api/admin/books", () => {
   });
 
   it("sets available copies equal to total copies", async () => {
+    const { requireAdminSession } = await import("../../../../lib/auth/guards");
+    requireAdminSession.mockResolvedValue({
+      session: { sub: "admin", role: "admin" },
+      response: null,
+    });
     prismaMock.book.create.mockResolvedValue({
       id: "book_1",
       title: "Distributed Systems",

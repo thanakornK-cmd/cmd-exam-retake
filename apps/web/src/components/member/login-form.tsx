@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { FormField } from "@library/ui";
 
@@ -10,8 +10,45 @@ type FormStatus = {
 
 function parseErrorMessage(status: number) {
   if (status === 401) return "Invalid credentials";
+  if (status === 503) return "Database is temporarily unavailable";
   return "Unable to log in";
 }
+
+const formStyle: CSSProperties = {
+  display: "grid",
+  gap: "1rem",
+  padding: "1.5rem",
+  borderRadius: "24px",
+  background: "rgba(255, 255, 255, 0.84)",
+  border: "1px solid rgba(148, 163, 184, 0.24)",
+  boxShadow: "0 24px 80px rgba(15, 23, 42, 0.14)",
+  backdropFilter: "blur(12px)",
+};
+
+const errorStyle: CSSProperties = {
+  margin: 0,
+  padding: "0.9rem 1rem",
+  borderRadius: "14px",
+  background: "rgba(239, 68, 68, 0.08)",
+  color: "#b91c1c",
+  border: "1px solid rgba(239, 68, 68, 0.2)",
+};
+
+const buttonStyle: CSSProperties = {
+  marginTop: "0.25rem",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: 0,
+  borderRadius: "999px",
+  padding: "0.95rem 1.25rem",
+  background: "linear-gradient(135deg, #0f172a, #334155)",
+  color: "white",
+  fontWeight: 700,
+  fontSize: "1rem",
+  cursor: "pointer",
+  boxShadow: "0 12px 24px rgba(15, 23, 42, 0.22)",
+};
 
 export function LoginForm() {
   const router = useRouter();
@@ -36,7 +73,18 @@ export function LoginForm() {
     });
 
     if (!response.ok) {
-      setStatus({ error: parseErrorMessage(response.status) });
+      let errorMessage = parseErrorMessage(response.status);
+
+      try {
+        const data = (await response.json()) as { error?: string };
+        if (data.error) {
+          errorMessage = data.error;
+        }
+      } catch {
+        // Keep the fallback message when the server does not return JSON.
+      }
+
+      setStatus({ error: errorMessage });
       return;
     }
 
@@ -47,11 +95,11 @@ export function LoginForm() {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
-      <FormField label="Email" name="email" type="email" />
-      <FormField label="Password" name="password" type="password" />
-      {status.error ? <p role="alert">{status.error}</p> : null}
-      <button type="submit" disabled={isPending}>
+    <form style={formStyle} onSubmit={handleSubmit}>
+      <FormField label="Email" name="email" type="email" autoComplete="email" placeholder="reader@example.com" />
+      <FormField label="Password" name="password" type="password" autoComplete="current-password" placeholder="••••••••" />
+      {status.error ? <p role="alert" style={errorStyle}>{status.error}</p> : null}
+      <button type="submit" disabled={isPending} style={buttonStyle}>
         {isPending ? "Logging in..." : "Log in"}
       </button>
     </form>

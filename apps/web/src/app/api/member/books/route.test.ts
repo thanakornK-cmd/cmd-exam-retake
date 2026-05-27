@@ -10,6 +10,10 @@ vi.mock("@library/db", () => ({
   prisma: prismaMock,
 }));
 
+vi.mock("../../../../lib/auth/guards", () => ({
+  requireMemberSession: vi.fn(),
+}));
+
 import { GET } from "./route";
 
 describe("GET /api/member/books", () => {
@@ -18,6 +22,11 @@ describe("GET /api/member/books", () => {
   });
 
   it("returns books for the catalog", async () => {
+    const { requireMemberSession } = await import("../../../../lib/auth/guards");
+    requireMemberSession.mockResolvedValue({
+      session: { sub: "member_1", role: "member" },
+      response: null,
+    });
     prismaMock.book.findMany.mockResolvedValue([
       {
         id: "book_1",

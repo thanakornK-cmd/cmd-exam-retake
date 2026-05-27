@@ -1,11 +1,77 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useTransition, type CSSProperties } from "react";
 import { FormField } from "@library/ui";
 
 type FormStatus = {
   error: string | null;
   success: string | null;
+};
+
+const formStyle: CSSProperties = {
+  display: "grid",
+  gap: "1rem",
+  padding: "1.5rem",
+  borderRadius: "24px",
+  background: "rgba(255, 255, 255, 0.84)",
+  border: "1px solid rgba(148, 163, 184, 0.24)",
+  boxShadow: "0 24px 80px rgba(15, 23, 42, 0.14)",
+  backdropFilter: "blur(12px)",
+};
+
+const selectStyle: CSSProperties = {
+  width: "100%",
+  borderRadius: "14px",
+  border: "1px solid rgba(148, 163, 184, 0.8)",
+  background: "rgba(255, 255, 255, 0.94)",
+  padding: "0.95rem 1rem",
+  fontSize: "1rem",
+  color: "#0f172a",
+  boxShadow: "0 1px 2px rgba(15, 23, 42, 0.04)",
+};
+
+const categoryLabelStyle: CSSProperties = {
+  display: "grid",
+  gap: "0.45rem",
+  color: "#0f172a",
+  fontSize: "0.95rem",
+  fontWeight: 600,
+};
+
+const alertStyle: CSSProperties = {
+  margin: 0,
+  padding: "0.9rem 1rem",
+  borderRadius: "14px",
+};
+
+const errorStyle: CSSProperties = {
+  ...alertStyle,
+  background: "rgba(239, 68, 68, 0.08)",
+  color: "#b91c1c",
+  border: "1px solid rgba(239, 68, 68, 0.2)",
+};
+
+const successStyle: CSSProperties = {
+  ...alertStyle,
+  background: "rgba(34, 197, 94, 0.1)",
+  color: "#166534",
+  border: "1px solid rgba(34, 197, 94, 0.2)",
+};
+
+const buttonStyle: CSSProperties = {
+  marginTop: "0.25rem",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: 0,
+  borderRadius: "999px",
+  padding: "0.95rem 1.25rem",
+  background: "linear-gradient(135deg, #0f172a, #334155)",
+  color: "white",
+  fontWeight: 700,
+  fontSize: "1rem",
+  cursor: "pointer",
+  boxShadow: "0 12px 24px rgba(15, 23, 42, 0.22)",
 };
 
 export function AdminBookForm() {
@@ -45,21 +111,21 @@ export function AdminBookForm() {
   }
 
   return (
-    <form className="grid gap-4" onSubmit={handleSubmit}>
+    <form style={formStyle} onSubmit={handleSubmit}>
       <FormField label="Title" name="title" />
       <FormField label="Author" name="author" />
-      <label className="grid gap-2 text-sm font-medium">
+      <label style={categoryLabelStyle}>
         <span>Category</span>
-        <select name="category" className="rounded border border-slate-300 px-3 py-2" defaultValue="textbook">
+        <select name="category" style={selectStyle} defaultValue="textbook">
           <option value="textbook">textbook</option>
           <option value="general">general</option>
           <option value="novel">novel</option>
         </select>
       </label>
       <FormField label="Total copies" name="totalCopies" type="number" min="1" step="1" />
-      {status.error ? <p role="alert">{status.error}</p> : null}
-      {status.success ? <p role="status">{status.success}</p> : null}
-      <button type="submit" disabled={isPending}>
+      {status.error ? <p role="alert" style={errorStyle}>{status.error}</p> : null}
+      {status.success ? <p role="status" style={successStyle}>{status.success}</p> : null}
+      <button type="submit" disabled={isPending} style={buttonStyle}>
         {isPending ? "Adding book..." : "Add book"}
       </button>
     </form>

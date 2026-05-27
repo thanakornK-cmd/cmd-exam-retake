@@ -56,4 +56,29 @@ describe("POST /api/member/auth/signup", () => {
       },
     });
   });
+
+  it("returns a temporary-unavailable error when the database cannot connect", async () => {
+    prismaMock.member.findUnique.mockRejectedValue(
+      Object.assign(new Error("connect failed"), {
+        name: "PrismaClientInitializationError",
+      }),
+    );
+
+    const response = await POST(
+      new Request("http://localhost/api/member/auth/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          name: "Reader",
+          email: "reader@example.com",
+          phone: "0123456789",
+          password: "secret123",
+        }),
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: "Database is temporarily unavailable",
+    });
+  });
 });

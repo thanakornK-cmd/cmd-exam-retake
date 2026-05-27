@@ -66,4 +66,24 @@ describe("POST /api/member/auth/login", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("set-cookie") ?? "").toContain("member_session=member.jwt.token");
   });
+
+  it("returns a temporary-unavailable error when the database cannot connect", async () => {
+    prismaMock.member.findUnique.mockRejectedValue(
+      Object.assign(new Error("connect failed"), {
+        name: "PrismaClientInitializationError",
+      }),
+    );
+
+    const response = await POST(
+      new Request("http://localhost/api/member/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email: "reader@example.com", password: "secret123" }),
+      }),
+    );
+
+    expect(response.status).toBe(503);
+    await expect(response.json()).resolves.toEqual({
+      error: "Database is temporarily unavailable",
+    });
+  });
 });

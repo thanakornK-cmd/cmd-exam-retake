@@ -1,11 +1,16 @@
 import React from "react";
 import { AdminBookForm } from "../../../../components/admin/admin-book-form";
+import { PageShell } from "../../../../components/layout/page-shell";
 
 export default function AdminBooksPage() {
   return (
-    <main className="grid gap-4">
-      <h1 className="text-2xl font-semibold">Books</h1>
+    <PageShell
+      variant="admin"
+      eyebrow="Inventory"
+      title="Book management"
+      description="Add new titles, set copy counts, and keep the catalog ready for members."
+    >
       <AdminBookForm />
-    </main>
+    </PageShell>
   );
 }

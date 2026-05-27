@@ -42,7 +42,7 @@ export async function GET(request: Request) {
     }),
   );
 
-  return new NextResponse(pdf, {
+  return new NextResponse(new Blob([pdf]), {
     headers: {
       "content-type": "application/pdf",
       "content-disposition": 'attachment; filename="overdue-loans-report.pdf"',

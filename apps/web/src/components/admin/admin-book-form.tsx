@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition, type CSSProperties } from "react";
 import { FormField } from "@library/ui";
+import { BOOK_LOAN_PERIOD_DAYS } from "@library/domain";
 
 type FormStatus = {
   error: string | null;
@@ -74,6 +75,24 @@ const buttonStyle: CSSProperties = {
   boxShadow: "0 12px 24px rgba(15, 23, 42, 0.22)",
 };
 
+const periodRows = [
+  {
+    category: "textbook",
+    description: "ตำราเรียน, หนังสือสอบ",
+    period: `${BOOK_LOAN_PERIOD_DAYS.textbook} days`,
+  },
+  {
+    category: "general",
+    description: "หนังสือทั่วไป (how-to, สารคดี, ธุรกิจ)",
+    period: `${BOOK_LOAN_PERIOD_DAYS.general} days`,
+  },
+  {
+    category: "novel",
+    description: "นิยาย, การ์ตูน",
+    period: `${BOOK_LOAN_PERIOD_DAYS.novel} days`,
+  },
+] as const;
+
 export function AdminBookForm() {
   const [status, setStatus] = useState<FormStatus>({ error: null, success: null });
   const [isPending, startTransition] = useTransition();
@@ -128,6 +147,54 @@ export function AdminBookForm() {
       <button type="submit" disabled={isPending} style={buttonStyle}>
         {isPending ? "Adding book..." : "Add book"}
       </button>
+
+      <section
+        style={{
+          display: "grid",
+          gap: "0.75rem",
+          padding: "1rem",
+          borderRadius: "18px",
+          background: "rgba(248, 250, 252, 0.9)",
+          border: "1px solid rgba(148, 163, 184, 0.18)",
+        }}
+      >
+        <div style={{ display: "grid", gap: "0.25rem" }}>
+          <h3 style={{ margin: 0, fontSize: "1rem", color: "#0f172a" }}>
+            Loan period reference
+          </h3>
+          <p style={{ margin: 0, color: "#475569", lineHeight: 1.5 }}>
+            Category loan durations are driven by the shared domain rules.
+          </p>
+        </div>
+        <div style={{ display: "grid", gap: "0.6rem" }}>
+          {periodRows.map((row) => (
+            <div
+              key={row.category}
+              style={{
+                display: "grid",
+                gap: "0.2rem",
+                padding: "0.75rem 0.9rem",
+                borderRadius: "14px",
+                background: "white",
+                border: "1px solid rgba(148, 163, 184, 0.14)",
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "0.75rem",
+                  alignItems: "baseline",
+                }}
+              >
+                <strong style={{ color: "#0f172a" }}>{row.category}</strong>
+                <span style={{ color: "#7c2d12", fontWeight: 700 }}>{row.period}</span>
+              </div>
+              <span style={{ color: "#475569" }}>{row.description}</span>
+            </div>
+          ))}
+        </div>
+      </section>
     </form>
   );
 }

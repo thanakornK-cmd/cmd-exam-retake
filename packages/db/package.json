@@ -10,7 +10,8 @@
   "scripts": {
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
     "prisma:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
-    "test": "vitest run src/client.test.ts"
+    "prisma:seed": "node --experimental-strip-types prisma/seed.ts",
+    "test": "vitest run src/client.test.ts prisma/seed.test.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.8.2"

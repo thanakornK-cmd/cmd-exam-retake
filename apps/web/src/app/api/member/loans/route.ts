@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
-import { MAX_ACTIVE_LOANS, calculateDueDate, generateLoanCode } from "@library/domain";
+import {
+  MAX_ACTIVE_LOANS,
+  calculateDueDate,
+  generateLoanCode,
+} from "@library/domain";
 import { requireMemberSession } from "../../../../lib/auth/guards";
 
 export const runtime = "nodejs";
@@ -21,9 +25,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid loan request" }, { status: 400 });
   }
 
+  const now = new Date();
+
   const [activeCount, overdueCount, book, sequence] = await Promise.all([
-    prisma.loan.count({ where: { memberId, status: "ACTIVE" } }),
-    prisma.loan.count({ where: { memberId, status: "OVERDUE" } }),
+    prisma.loan.count({ where: { memberId, returnDate: null, dueDate: { gte: now } } }),
+    prisma.loan.count({ where: { memberId, returnDate: null, dueDate: { lt: now } } }),
     prisma.book.findUnique({ where: { id: bookId } }),
     prisma.loan.count(),
   ]);
@@ -39,8 +45,6 @@ export async function POST(request: Request) {
   if (!book || book.availableCopies <= 0) {
     return NextResponse.json({ error: "Book is unavailable" }, { status: 409 });
   }
-
-  const now = new Date();
 
   const loan = await prisma.$transaction(async (tx) => {
     const created = await tx.loan.create({

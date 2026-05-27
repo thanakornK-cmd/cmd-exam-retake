@@ -41,4 +41,16 @@ describe("AdminBookForm", () => {
       expect(fetchMock).toHaveBeenCalledWith("/api/admin/books", expect.any(Object));
     });
   });
+
+  it("shows the loan period reference", () => {
+    render(<AdminBookForm />);
+
+    expect(screen.getByText(/loan period reference/i)).toBeInTheDocument();
+    expect(screen.getAllByText("textbook").length).toBeGreaterThan(0);
+    expect(screen.getByText("3 days")).toBeInTheDocument();
+    expect(screen.getAllByText("general").length).toBeGreaterThan(0);
+    expect(screen.getByText("7 days")).toBeInTheDocument();
+    expect(screen.getAllByText("novel").length).toBeGreaterThan(0);
+    expect(screen.getByText("14 days")).toBeInTheDocument();
+  });
 });

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
-import { calculateFineAmount, countOverdueWeekdays } from "@library/domain";
+import { calculateFineAmount, countOverdueWeekdays, isLoanOverdue } from "@library/domain";
 import { buildOverdueReportPdf } from "../../../../../lib/pdf/overdue-report";
 import { requireAdminSession } from "../../../../../lib/auth/guards";
 
@@ -12,14 +12,15 @@ export async function GET(request: Request) {
   if (auth.response) return auth.response;
 
   const loans = await prisma.loan.findMany({
-    where: { status: "OVERDUE" },
+    where: { returnDate: null },
     include: { book: true, member: true },
     orderBy: { dueDate: "asc" },
   });
 
   const now = new Date();
+  const overdueLoans = loans.filter((loan) => isLoanOverdue(loan, now));
   const pdf = await buildOverdueReportPdf(
-    loans.map((loan) => {
+    overdueLoans.map((loan) => {
       const overdueDays = countOverdueWeekdays(loan.dueDate, now);
       return {
         member: loan.member.name,

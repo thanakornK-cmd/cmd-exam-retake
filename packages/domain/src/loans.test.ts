@@ -3,7 +3,9 @@ import {
   calculateDueDate,
   calculateFineAmount,
   countOverdueWeekdays,
+  getLoanStatus,
   generateLoanCode,
+  isLoanOverdue,
 } from "./loans";
 
 describe("loan rules", () => {
@@ -33,5 +35,29 @@ describe("loan rules", () => {
 
   it("generates a dated loan code", () => {
     expect(generateLoanCode(new Date("2026-05-27T00:00:00Z"), 7)).toBe("LN-20260527-0007");
+  });
+
+  it("treats an unreturned past-due loan as overdue", () => {
+    expect(
+      isLoanOverdue(
+        {
+          dueDate: new Date("2026-05-04T00:00:00Z"),
+          returnDate: null,
+        },
+        new Date("2026-05-05T00:00:00Z"),
+      ),
+    ).toBe(true);
+  });
+
+  it("treats a returned loan as returned even after due date", () => {
+    expect(
+      getLoanStatus(
+        {
+          dueDate: new Date("2026-05-04T00:00:00Z"),
+          returnDate: new Date("2026-05-05T00:00:00Z"),
+        },
+        new Date("2026-05-06T00:00:00Z"),
+      ),
+    ).toBe("RETURNED");
   });
 });

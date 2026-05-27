@@ -20,6 +20,24 @@ export function calculateDueDate(loanDate: Date, category: LoanCategory) {
   return addDays(loanDate, BOOK_LOAN_PERIOD_DAYS[category]);
 }
 
+export function isLoanOverdue(
+  loan: { dueDate: Date; returnDate: Date | null },
+  now: Date = new Date(),
+) {
+  return loan.returnDate === null && loan.dueDate.getTime() < now.getTime();
+}
+
+export function getLoanStatus(
+  loan: { dueDate: Date; returnDate: Date | null },
+  now: Date = new Date(),
+) {
+  if (loan.returnDate !== null) {
+    return "RETURNED" as const;
+  }
+
+  return isLoanOverdue(loan, now) ? ("OVERDUE" as const) : ("ACTIVE" as const);
+}
+
 export function countOverdueWeekdays(dueDate: Date, returnDate: Date) {
   if (returnDate <= dueDate) {
     return 0;

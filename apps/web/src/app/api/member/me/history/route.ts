@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
+import { getLoanStatus } from "@library/domain";
 import { requireMemberSession } from "../../../../../lib/auth/guards";
 
 export const runtime = "nodejs";
@@ -20,5 +21,12 @@ export async function GET(request: Request) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(loans);
+  const now = new Date();
+
+  return NextResponse.json(
+    loans.map((loan) => ({
+      ...loan,
+      status: getLoanStatus(loan, now),
+    })),
+  );
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
+import { getLoanStatus } from "@library/domain";
 import { requireMemberSession } from "../../../../../lib/auth/guards";
 
 export const runtime = "nodejs";
@@ -17,11 +18,18 @@ export async function GET(request: Request) {
   const loans = await prisma.loan.findMany({
     where: {
       memberId,
-      status: { in: ["ACTIVE", "OVERDUE"] },
+      returnDate: null,
     },
     include: { book: true },
     orderBy: { dueDate: "asc" },
   });
 
-  return NextResponse.json(loans);
+  const now = new Date();
+
+  return NextResponse.json(
+    loans.map((loan) => ({
+      ...loan,
+      status: getLoanStatus(loan, now),
+    })),
+  );
 }

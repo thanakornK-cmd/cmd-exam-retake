@@ -1,18 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCookieValue } from "./src/lib/auth/guards";
 
+const PUBLIC_AUTH_PATHS = new Set([
+  "/login",
+  "/signup",
+  "/admin/login",
+  "/api/member/auth/signup",
+  "/api/member/auth/login",
+  "/api/admin/auth/login",
+]);
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname === "/login" || pathname === "/signup" || pathname === "/admin/login") {
-    return NextResponse.next();
-  }
-
-  if (
-    pathname === "/api/member/auth/signup" ||
-    pathname === "/api/member/auth/login" ||
-    pathname === "/api/admin/auth/login"
-  ) {
+  if (PUBLIC_AUTH_PATHS.has(pathname)) {
     return NextResponse.next();
   }
 

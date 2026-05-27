@@ -13,6 +13,16 @@ describe("middleware", () => {
     expect(response.headers.get("x-middleware-next")).toBe("1");
   });
 
+  it("allows public admin auth routes", () => {
+    const response = middleware(
+      new NextRequest("http://localhost/api/admin/auth/login", {
+        method: "POST",
+      }),
+    );
+
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
+
   it("blocks protected member api routes without a session", () => {
     const response = middleware(
       new NextRequest("http://localhost/api/member/books", {

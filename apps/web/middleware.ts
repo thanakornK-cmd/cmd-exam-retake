@@ -8,6 +8,14 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (
+    pathname === "/api/member/auth/signup" ||
+    pathname === "/api/member/auth/login" ||
+    pathname === "/api/admin/auth/login"
+  ) {
+    return NextResponse.next();
+  }
+
   const memberArea = pathname === "/catalog" || pathname === "/loans" || pathname === "/history";
   const memberApi = pathname.startsWith("/api/member/");
   const adminArea = pathname === "/admin/dashboard";

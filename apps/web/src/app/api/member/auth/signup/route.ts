@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@library/db";
 import { signupSchema } from "@library/domain";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   const parsed = signupSchema.safeParse(await request.json());
 

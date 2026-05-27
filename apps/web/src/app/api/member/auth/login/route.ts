@@ -4,6 +4,9 @@ import { prisma } from "@library/db";
 import { loginSchema } from "@library/domain";
 import { createMemberSession } from "../../../../../lib/auth/member-session";
 
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
 export async function POST(request: Request) {
   const parsed = loginSchema.safeParse(await request.json());
 

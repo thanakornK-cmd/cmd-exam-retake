@@ -42,7 +42,9 @@ export async function GET(request: Request) {
     }),
   );
 
-  return new NextResponse(new Blob([pdf]), {
+  const pdfBody = pdf.buffer.slice(pdf.byteOffset, pdf.byteOffset + pdf.byteLength);
+
+  return new NextResponse(pdfBody, {
     headers: {
       "content-type": "application/pdf",
       "content-disposition": 'attachment; filename="overdue-loans-report.pdf"',

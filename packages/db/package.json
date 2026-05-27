@@ -9,6 +9,7 @@
   },
   "scripts": {
     "prisma:generate": "prisma generate --schema prisma/schema.prisma",
+    "prisma:migrate:deploy": "prisma migrate deploy --schema prisma/schema.prisma",
     "test": "vitest run src/client.test.ts"
   },
   "dependencies": {

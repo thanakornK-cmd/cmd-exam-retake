@@ -19,7 +19,7 @@ export function middleware(request: NextRequest) {
 
   const memberArea = pathname === "/catalog" || pathname === "/loans" || pathname === "/history";
   const memberApi = pathname.startsWith("/api/member/");
-  const adminArea = pathname === "/admin/dashboard";
+  const adminArea = pathname === "/admin/dashboard" || pathname === "/admin/books";
   const adminApi = pathname.startsWith("/api/admin/");
 
   if (!memberArea && !memberApi && !adminArea && !adminApi) {
@@ -66,6 +66,7 @@ export const config = {
     "/loans/:path*",
     "/history/:path*",
     "/admin/dashboard/:path*",
+    "/admin/books/:path*",
     "/api/member/:path*",
     "/api/admin/:path*",
   ],

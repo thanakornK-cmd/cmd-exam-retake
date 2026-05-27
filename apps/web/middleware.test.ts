@@ -32,4 +32,14 @@ describe("middleware", () => {
 
     expect(response.status).toBe(401);
   });
+
+  it("redirects protected admin pages without a session", () => {
+    const response = middleware(
+      new NextRequest("http://localhost/admin/books", {
+        method: "GET",
+      }),
+    );
+
+    expect(response.headers.get("location")).toContain("/admin/login");
+  });
 });

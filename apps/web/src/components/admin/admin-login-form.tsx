@@ -8,12 +8,7 @@ type FormStatus = {
   error: string | null;
 };
 
-function parseErrorMessage(status: number) {
-  if (status === 409) return "Email already in use";
-  return "Unable to create account";
-}
-
-export function SignupForm() {
+export function AdminLoginForm() {
   const router = useRouter();
   const [status, setStatus] = useState<FormStatus>({ error: null });
   const [isPending, startTransition] = useTransition();
@@ -23,40 +18,36 @@ export function SignupForm() {
 
     const formData = new FormData(event.currentTarget);
     const payload = {
-      name: String(formData.get("name") ?? ""),
-      email: String(formData.get("email") ?? ""),
-      phone: String(formData.get("phone") ?? ""),
+      username: String(formData.get("username") ?? ""),
       password: String(formData.get("password") ?? ""),
     };
 
     setStatus({ error: null });
 
-    const response = await fetch("/api/member/auth/signup", {
+    const response = await fetch("/api/admin/auth/login", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
-      setStatus({ error: parseErrorMessage(response.status) });
+      setStatus({ error: "Invalid credentials" });
       return;
     }
 
     startTransition(() => {
-      router.push("/login");
+      router.push("/admin/dashboard");
       router.refresh();
     });
   }
 
   return (
     <form className="grid gap-4" onSubmit={handleSubmit}>
-      <FormField label="Name" name="name" />
-      <FormField label="Email" name="email" type="email" />
-      <FormField label="Phone" name="phone" />
+      <FormField label="Username" name="username" />
       <FormField label="Password" name="password" type="password" />
       {status.error ? <p role="alert">{status.error}</p> : null}
       <button type="submit" disabled={isPending}>
-        {isPending ? "Creating account..." : "Create account"}
+        {isPending ? "Logging in..." : "Admin log in"}
       </button>
     </form>
   );

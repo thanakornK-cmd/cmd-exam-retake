@@ -4,14 +4,14 @@ function getSecret() {
   return new TextEncoder().encode(process.env.JWT_SECRET ?? "");
 }
 
-export async function createMemberSession(memberId: string) {
-  return new SignJWT({ sub: memberId, role: "member" })
+export async function createAdminSession(username: string) {
+  return new SignJWT({ sub: username, role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
+    .setExpirationTime("1d")
     .sign(getSecret());
 }
 
-export async function verifyMemberSession(token: string) {
+export async function verifyAdminSession(token: string) {
   const { payload } = await jwtVerify(token, getSecret());
   return payload;
 }

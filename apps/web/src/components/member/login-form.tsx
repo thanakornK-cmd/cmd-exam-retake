@@ -102,6 +102,23 @@ export function LoginForm() {
       <button type="submit" disabled={isPending} style={buttonStyle}>
         {isPending ? "Logging in..." : "Log in"}
       </button>
+      <a
+        href="/signup"
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          borderRadius: "999px",
+          padding: "0.95rem 1.25rem",
+          border: "1px solid rgba(148, 163, 184, 0.3)",
+          color: "#0f172a",
+          fontWeight: 700,
+          textDecoration: "none",
+          background: "rgba(255, 255, 255, 0.75)",
+        }}
+      >
+        Sign up
+      </a>
     </form>
   );
 }

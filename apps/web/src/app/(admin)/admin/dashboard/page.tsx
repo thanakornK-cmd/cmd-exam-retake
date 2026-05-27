@@ -1,5 +1,6 @@
 import React from "react";
 import { PageShell } from "../../../../components/layout/page-shell";
+import { AdminLogoutButton } from "../../../../components/admin/admin-logout-button";
 
 export default function AdminDashboardPage() {
   return (
@@ -36,6 +37,9 @@ export default function AdminDashboardPage() {
             <p style={{ margin: "0.4rem 0 0", color: "#475569", lineHeight: 1.5 }}>{body}</p>
           </article>
         ))}
+      </div>
+      <div style={{ marginTop: "0.5rem" }}>
+        <AdminLogoutButton />
       </div>
     </PageShell>
   );

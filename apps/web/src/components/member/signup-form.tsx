@@ -142,13 +142,13 @@ export function SignupForm() {
         </p>
       </div>
 
-      <FormField label="Name" name="name" autoComplete="name" placeholder="thanakorn" />
+      <FormField label="Name" name="name" autoComplete="name" placeholder="Your name" />
       <FormField
         label="Email"
         name="email"
         type="email"
         autoComplete="email"
-        placeholder="thanakorn@mail.com"
+        placeholder="you@example.com"
       />
       <FormField
         label="Phone"

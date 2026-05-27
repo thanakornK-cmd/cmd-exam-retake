@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { CatalogTable } from "../../../components/member/catalog-table";
 import { PageShell } from "../../../components/layout/page-shell";
+import { MemberLogoutButton } from "../../../components/member/member-logout-button";
 
 type BookRow = {
   id: string;
@@ -100,6 +101,9 @@ export default function CatalogPage() {
           </p>
         ) : null}
         <CatalogTable books={books} onBorrow={handleBorrow} />
+        <div>
+          <MemberLogoutButton />
+        </div>
       </div>
     </PageShell>
   );

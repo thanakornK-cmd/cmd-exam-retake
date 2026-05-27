@@ -9,7 +9,7 @@ export default function AdminBooksPage() {
       variant="admin"
       eyebrow="Inventory"
       title="Book management"
-      description="Add new titles, set copy counts, and keep the catalog ready for members."
+      description="Add and edit titles, set copy counts, and keep the catalog ready for members."
     >
       <div style={{ display: "grid", gap: "1rem" }}>
         <AdminBookForm />

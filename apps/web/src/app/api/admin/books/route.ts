@@ -6,6 +6,17 @@ import { requireAdminSession } from "../../../../lib/auth/guards";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+export async function GET(request: Request) {
+  const auth = await requireAdminSession(request);
+  if (auth.response) return auth.response;
+
+  const books = await prisma.book.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  return NextResponse.json(books);
+}
+
 export async function POST(request: Request) {
   const auth = await requireAdminSession(request);
   if (auth.response) return auth.response;

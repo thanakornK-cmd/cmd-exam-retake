@@ -42,4 +42,17 @@ describe("middleware", () => {
 
     expect(response.headers.get("location")).toContain("/admin/login");
   });
+
+  it("allows admin api requests when both admin and member cookies are present", () => {
+    const response = middleware(
+      new NextRequest("http://localhost/api/admin/books", {
+        method: "POST",
+        headers: {
+          cookie: "admin_session=admin.jwt; member_session=member.jwt",
+        },
+      }),
+    );
+
+    expect(response.headers.get("x-middleware-next")).toBe("1");
+  });
 });

@@ -55,13 +55,6 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  if (adminApi) {
-    const memberToken = getCookieValue(request.headers.get("cookie"), "member_session");
-    if (memberToken) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  }
-
   return NextResponse.next();
 }
 
